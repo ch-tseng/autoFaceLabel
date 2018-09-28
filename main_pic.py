@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import cv2
 from imutils.face_utils import rect_to_bb
 import dlib
@@ -104,7 +107,7 @@ def putText(image, text, x, y, color=(255,255,255), thickness=1, size=1.2):
 
 
 start_time = time.time()
-imageFolder = "/export/home/digits/akai-shared-old/spitdoor1/original/201808/"
+imageFolder = ""/export/home/digits/q_drive/尾牙/2018/20180201/"
 
 i = 0
 for file in os.listdir(imageFolder):
@@ -140,9 +143,6 @@ for file in os.listdir(imageFolder):
 
             #frameCopy = putText(frameCopy, "saved to "+xmlfilename, 10,80, color=(0,255,0), thickness=2, size=0.8)
             i += 1
-        else:
-            os.remove(imageFolder + folderCharacter + file)
-            print("No face, delete the file: " + imageFolder + folderCharacter + file)
 
         #cv2.imshow("Frame", frameCopy)
         #cv2.waitKey(1)
