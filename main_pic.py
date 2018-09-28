@@ -6,7 +6,7 @@ import os, time
 import os.path
 
 #-----------------------------------
-datasetPath = "faceYolo/"
+datasetPath = "faceYolo_door/"
 imgPath = "images/"
 labelPath = "labels/"
 imgType = "jpg"  # jpg, png
@@ -140,6 +140,9 @@ for file in os.listdir(imageFolder):
 
             #frameCopy = putText(frameCopy, "saved to "+xmlfilename, 10,80, color=(0,255,0), thickness=2, size=0.8)
             i += 1
+        else:
+            os.remove(imageFolder + folderCharacter + file)
+            print("No face, delete the file: " + imageFolder + folderCharacter + file)
 
         #cv2.imshow("Frame", frameCopy)
         #cv2.waitKey(1)
