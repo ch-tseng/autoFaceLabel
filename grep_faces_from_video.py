@@ -25,8 +25,7 @@ cascade_neighbors = 10
 dlib_detectorRatio = 1
 folderCharacter = "/"  # \\ is for windows
 
-video_file = "/home/digits/Videos/door_in.mp4"
-output_video = "/home/digits/Videos/door_in_1_dlib.avi"
+video_folder = "/media/sf_VMshare/videos"
 
 #------------------------------------
 
@@ -107,55 +106,60 @@ def putText(image, text, x, y, color=(255,255,255), thickness=1, size=1.2):
 
 
 start_time = time.time()
-VIDEO_IN = cv2.VideoCapture(video_file)
-#VIDEO_IN.set(cv2.CAP_PROP_FRAME_WIDTH, cam_resolution[0])
-#VIDEO_IN.set(cv2.CAP_PROP_FRAME_HEIGHT, cam_resolution[1])
-
-fourcc = cv2.VideoWriter_fourcc(*'MJPG')
 width = 800
 height = 800
-out = cv2.VideoWriter(output_video,fourcc, 30.0, (int(width),int(height)))
 
 i = 0
-while True:
-    hasFrame, frame = VIDEO_IN.read()
-    if not hasFrame:
-            print("Done processing !!!")
-            print("--- %s seconds ---" % (time.time() - start_time))
-            break
 
-    #frame = imutils.rotate(frame, 90)
-    if(faceDetectType == "dlib"):
-        faces = getFaces_dlib(frame)
+for file in os.listdir(video_folder):
+    filename, file_extension = os.path.splitext(file)
+    file_extension = file_extension.lower()
 
-    else:
-        faces = getFaces_cascade(frame)
+    noFrame = False
+    print(video_folder + "/" + file)
+    if(file_extension==".mp4" or file_extension==".mov" or file_extension==".mk4" or file_extension==".avi"):
+        VIDEO_IN = cv2.VideoCapture(video_folder + "/" + file)
 
-    frameCopy = frame.copy()
-    #frameCopy = putText(frameCopy, str(len(faces))+" faces", 10,30, color=(0,255,0), thickness=2, size=0.8)
+        while noFrame is False:
+            hasFrame, frame = VIDEO_IN.read()
+            if not hasFrame:
+                print("Done processing !!!")
+                print("--- %s seconds ---" % (time.time() - start_time))
+                noFrame = True
+                break
 
-    if(len(faces)>0):
-        for (x,y,w,h) in faces:
-            cv2.rectangle( frameCopy,(x,y),(x+w,y+h),(0,255,0),2)
+            #frame = imutils.rotate(frame, 90)
+            if(faceDetectType == "dlib"):
+                faces = getFaces_dlib(frame)
 
-        filename = "face_" + str(time.time()) + "." + str(i)
-        #save images to dataset
-        cv2.imwrite(datasetPath + imgPath + filename + "." + imgType, frame)
+            else:
+                faces = getFaces_cascade(frame)
 
-        xmlfilename = filename + ".xml"
-        xmlContent = generateXML(frame, xmlfilename, datasetPath + labelPath + xmlfilename, faces)
-        file = open(datasetPath + labelPath + xmlfilename, "w")
-        file.write(xmlContent)
-        file.close
+            frameCopy = frame.copy()
+            #frameCopy = putText(frameCopy, str(len(faces))+" faces", 10,30, color=(0,255,0), thickness=2, size=0.8)
 
-        #frameCopy = putText(frameCopy, "saved to "+xmlfilename, 10,80, color=(0,255,0), thickness=2, size=0.8)
-        out.write(frameCopy)
-        print("Frame {} processed, {} faces.".format(i, len(faces)))
+            if(len(faces)>0):
+                for (x,y,w,h) in faces:
+                    cv2.rectangle( frameCopy,(x,y),(x+w,y+h),(0,255,0),2)
 
-    else:
-        out.write(frameCopy)
-        print("Frame {} processed, no face.".format(i))
+                filename = "face_" + str(time.time()) + "." + str(i)
+                #save images to dataset
+                cv2.imwrite(datasetPath + imgPath + filename + "." + imgType, frame)
 
-    i += 1
-    #cv2.imshow("Frame", imutils.resize(frameCopy, width=640))
-    #cv2.waitKey(1)
+                xmlfilename = filename + ".xml"
+                xmlContent = generateXML(frame, xmlfilename, datasetPath + labelPath + xmlfilename, faces)
+                file = open(datasetPath + labelPath + xmlfilename, "w")
+                file.write(xmlContent)
+                file.close
+
+                #frameCopy = putText(frameCopy, "saved to "+xmlfilename, 10,80, color=(0,255,0), thickness=2, size=0.8)
+                #out.write(frameCopy)
+                print("Frame {} processed, {} faces.".format(i, len(faces)))
+
+            else:
+                #out.write(frameCopy)
+                print("Frame {} processed, no face.".format(i))
+
+            i += 1
+            cv2.imshow("Frame", imutils.resize(frameCopy, width=640))
+            cv2.waitKey(1)
